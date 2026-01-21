@@ -8,54 +8,58 @@ Reusable GitHub Actions workflows for Open Terms Archive npm packages.
 
 Decides whether the release process should proceed based on the commit context.
 
-**Output:**
-- `should-release`: `true` if the commit is not from the release bot and comes from a merged PR
+#### Outputs
+- `should-release` — `true` if the commit is not from the release bot and comes from a merged PR
+
+---
 
 ### `changelog.yml`
 
 Validates the changelog format.
 
-**Triggers:** `pull_request`, `workflow_dispatch`, `workflow_call`
+#### Outputs
+- `release-type` — `major`, `minor`, `patch`, or `no-release`
 
-**Output:**
-- `release-type`: The release type extracted from changelog (`major`, `minor`, `patch`, `no-release`)
-
-### `release.yml`
-
-Performs the actual release: updates changelog, bumps version, creates tag, publishes to npm (optional), creates GitHub release.
-
-**Inputs:**
-| Input | Type | Default | Description |
-|-------|------|---------|-------------|
-| `publish-npm` | boolean | `true` | Whether to publish the package to npm |
-
-**Outputs:**
-| Output | Description |
-|--------|-------------|
-| `released` | `true` if a release was made |
-| `version` | The version that was released |
-
-**Required secrets:**
-- `RELEASE_BOT_GITHUB_TOKEN`: GitHub token with push access
-
-### `clean-changelog.yml`
-
-Cleans up the changelog when no release is needed (removes empty "Unreleased" section).
-
-**Required secrets:**
-- `RELEASE_BOT_GITHUB_TOKEN`: GitHub token with push access
+---
 
 ### `commit.yml`
 
 Lints commit messages using commitlint.
 
-**Triggers:** `pull_request`, `workflow_call`
-
-**Prerequisites:**
+#### Prerequisites
 - `@commitlint/cli` in devDependencies
-- `commit-messages:lint` script in package.json (e.g., `"commitlint --from=main --to=HEAD"`)
+- `commit-messages:lint` script in package.json
+
+---
+
+### `release.yml`
+
+Performs the actual release: updates changelog, bumps version, creates tag, publishes to npm, creates GitHub release.
+
+#### Inputs
+- `publish-npm` — boolean, default `true`
+
+#### Outputs
+- `released` — `true` if a release was made
+- `version` — the version that was released
+
+#### Secrets
+- `RELEASE_BOT_GITHUB_TOKEN`
+
+---
+
+### `clean-changelog.yml`
+
+Cleans up the changelog when no release is needed.
+
+#### Secrets
+- `RELEASE_BOT_GITHUB_TOKEN`
 
 ## Dependency Graph
+
+The shared workflows are independent building blocks. Each project assembles them by defining dependencies (`needs:`) and conditions (`if:`) in its own `release.yml`.
+
+Recommended orchestration:
 
 ```
 release-decision
@@ -115,8 +119,6 @@ jobs:
     needs: [changelog, test]
     if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
     uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@main
-    with:
-      publish-npm: true
     secrets: inherit
 
   clean-changelog:
