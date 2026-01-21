@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release-decision:
+    uses: ./.github/workflows/release-decision.yml
+
+  changelog:
+    needs: release-decision
+    if: ${{ needs.release-decision.outputs.should-release == 'true' }}
+    uses: ./.github/workflows/changelog.yml
+
+  release:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
+    uses: ./.github/workflows/release.yml
+    with:
+      npm: none
+    secrets: inherit
+
+  clean-changelog:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type == 'no-release' }}
+    uses: ./.github/workflows/clean-changelog.yml
+    secrets: inherit
