@@ -1,7 +1,6 @@
 name: Lint commit messages
 
 on:
-  pull_request:
   workflow_call:
 
 permissions:
