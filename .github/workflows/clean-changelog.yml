@@ -10,7 +10,7 @@ jobs:
   clean:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           ref: main
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
@@ -21,7 +21,7 @@ jobs:
           git config --global user.email "release-bot@opentermsarchive.org"
 
       - name: Update changelog for release
-        uses: OpenTermsArchive/changelog-action/release@v0.2.0
+        uses: OpenTermsArchive/changelog-action/release@31a72bbaf2f2b6d0be35bd8f0fad8f9cd6a052f4 # v0.2.0
 
       - name: Save changelog
         run: |

@@ -13,8 +13,8 @@ jobs:
     outputs:
       release-type: ${{ steps.validate-changelog.outputs.release-type }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Validate changelog
         id: validate-changelog
-        uses: OpenTermsArchive/changelog-action/validate@v0.2.0
+        uses: OpenTermsArchive/changelog-action/validate@31a72bbaf2f2b6d0be35bd8f0fad8f9cd6a052f4 # v0.2.0

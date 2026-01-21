@@ -27,12 +27,12 @@ jobs:
       version: ${{ steps.release-changelog.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           ref: main
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         if: ${{ inputs.npm != 'none' }}
         with:
           node-version: '24'
@@ -45,7 +45,7 @@ jobs:
 
       - name: Update changelog for release
         id: release-changelog
-        uses: OpenTermsArchive/changelog-action/release@v0.2.0
+        uses: OpenTermsArchive/changelog-action/release@31a72bbaf2f2b6d0be35bd8f0fad8f9cd6a052f4 # v0.2.0
 
       - name: Bump package version
         if: ${{ inputs.npm != 'none' }}
@@ -69,7 +69,7 @@ jobs:
         run: git push origin main && git push --tags
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
         with:
           tag_name: v${{ steps.release-changelog.outputs.version }}
           body: ${{ steps.release-changelog.outputs.content }}
