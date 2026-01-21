@@ -42,6 +42,9 @@ Performs the actual release: updates changelog, bumps version, creates tag, publ
   - `'version'` — update package.json only (for private packages)
   - `'none'` — no package.json (GitHub release only)
 
+#### Required permissions
+When using `npm: publish`, the calling workflow must declare `id-token: write` for npm provenance.
+
 #### Outputs
 - `released` — `true` if a release was made
 - `version` — the version that was released

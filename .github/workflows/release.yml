@@ -18,9 +18,6 @@ on:
       RELEASE_BOT_GITHUB_TOKEN:
         required: true
 
-permissions:
-  id-token: write # Required for npm provenance
-  contents: read
 
 jobs:
   release:
