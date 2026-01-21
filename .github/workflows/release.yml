@@ -3,10 +3,10 @@ name: Release
 on:
   workflow_call:
     inputs:
-      publish-npm:
-        description: Whether to publish the package to npm
-        type: boolean
-        default: true
+      npm:
+        description: "npm release mode: 'publish' (update package.json + publish), 'version' (update package.json only), 'none' (no package.json)"
+        type: string
+        default: 'publish'
     outputs:
       released:
         description: Whether a release was actually made
@@ -36,6 +36,7 @@ jobs:
           token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
+        if: ${{ inputs.npm != 'none' }}
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
@@ -50,18 +51,21 @@ jobs:
         uses: OpenTermsArchive/changelog-action/release@v0.2.0
 
       - name: Bump package version
+        if: ${{ inputs.npm != 'none' }}
         run: npm --no-git-tag-version version ${{ steps.release-changelog.outputs.version }}
 
-      - name: Commit CHANGELOG.md and package.json changes and create tag
+      - name: Commit changes and create tag
         run: |
-          git add "package.json"
-          git add "package-lock.json"
           git add "CHANGELOG.md"
+          if [[ "${{ inputs.npm }}" != "none" ]]; then
+            git add "package.json"
+            git add "package-lock.json"
+          fi
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
       - name: Publish to npm
-        if: ${{ inputs.publish-npm }}
+        if: ${{ inputs.npm == 'publish' }}
         run: npm publish --provenance
 
       - name: Push changes to repository
