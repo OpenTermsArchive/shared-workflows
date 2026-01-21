@@ -1,0 +1,22 @@
+name: Changelog
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      release-type:
+        description: The release type extracted from changelog (major, minor, patch, no-release)
+        value: ${{ jobs.validate.outputs.release-type }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      release-type: ${{ steps.validate-changelog.outputs.release-type }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate changelog
+        id: validate-changelog
+        uses: OpenTermsArchive/changelog-action/validate@v0.2.0
