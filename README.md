@@ -37,7 +37,10 @@ Lints commit messages using commitlint.
 Performs the actual release: updates changelog, bumps version, creates tag, publishes to npm, creates GitHub release.
 
 #### Inputs
-- `publish-npm` — boolean, default `true`
+- `npm` — string, default `'publish'`
+  - `'publish'` — update package.json + publish to npm
+  - `'version'` — update package.json only (for private packages)
+  - `'none'` — no package.json (GitHub release only)
 
 #### Outputs
 - `released` — `true` if a release was made
@@ -128,7 +131,7 @@ jobs:
     secrets: inherit
 ```
 
-### Without npm publish
+### For private npm packages (no publish)
 
 ```yaml
   release:
@@ -136,7 +139,19 @@ jobs:
     if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
     uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@main
     with:
-      publish-npm: false
+      npm: version
+    secrets: inherit
+```
+
+### For repos without package.json (GitHub release only)
+
+```yaml
+  release:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@main
+    with:
+      npm: none
     secrets: inherit
 ```
 
