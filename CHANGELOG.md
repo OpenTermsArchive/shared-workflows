@@ -2,3 +2,14 @@
 
 All changes that impact users of this module are documented in this file, in the [Common Changelog](https://common-changelog.org) format with some additional specifications defined in the CONTRIBUTING file. This codebase adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased [minor]
+
+> Development of this release was supported by [Reset Tech](https://www.reset.tech).
+
+### Added
+
+- Add reusable workflow for release decision
+- Add reusable workflow for changelog validation
+- Add reusable workflow for commit message linting
+- Add reusable workflow for npm/GitHub release
+- Add reusable workflow for changelog cleanup
