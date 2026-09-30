@@ -7,6 +7,10 @@ on:
         description: "npm release mode: 'publish' (update package.json + publish), 'version' (update package.json only), 'none' (no package.json)"
         type: string
         default: 'publish'
+      galaxy:
+        description: "Ansible Galaxy release mode: 'publish' (update galaxy.yml + publish), 'version' (update galaxy.yml only), 'none' (no galaxy.yml)"
+        type: string
+        default: 'none'
     outputs:
       released:
         description: Whether a release was actually made
@@ -17,6 +21,8 @@ on:
     secrets:
       RELEASE_BOT_GITHUB_TOKEN:
         required: true
+      GALAXY_API_KEY:
+        required: false
 
 
 jobs:
@@ -51,6 +57,11 @@ jobs:
         if: ${{ inputs.npm != 'none' }}
         run: npm --no-git-tag-version version ${{ steps.release-changelog.outputs.version }}
 
+      - name: Bump collection version
+        if: ${{ inputs.galaxy != 'none' }}
+        run: |
+          sed -i "s/^version: .*/version: ${{ steps.release-changelog.outputs.version }}/" galaxy.yml
+
       - name: Commit changes and create tag
         run: |
           git add "CHANGELOG.md"
@@ -58,12 +69,23 @@ jobs:
             git add "package.json"
             git add "package-lock.json"
           fi
+          if [[ "${{ inputs.galaxy }}" != "none" ]]; then
+            git add "galaxy.yml"
+          fi
           git commit -m "Release v${{ steps.release-changelog.outputs.version }}"
           git tag v${{ steps.release-changelog.outputs.version }}
 
       - name: Publish to npm
         if: ${{ inputs.npm == 'publish' }}
         run: npm publish --provenance
+
+      - name: Publish to Ansible Galaxy
+        if: ${{ inputs.galaxy == 'publish' }}
+        env:
+          GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
+        run: |
+          ansible-galaxy collection build --output-path "$RUNNER_TEMP/galaxy"
+          ansible-galaxy collection publish "$RUNNER_TEMP"/galaxy/*.tar.gz --api-key "$GALAXY_API_KEY"
 
       - name: Push changes to repository
         run: git push origin main && git push --tags
