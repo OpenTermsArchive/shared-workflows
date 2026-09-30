@@ -4,6 +4,8 @@ All changes that impact users of this module are documented in this file, in the
 
 ## Unreleased [minor]
 
+> Development of this release was supported by [Anthelia](https://anthelia.tech).
+
 ### Added
 
 - Add `galaxy` input to the release workflow to update the version of Ansible collections and publish them on Ansible Galaxy
