@@ -1,6 +1,6 @@
 # Shared Workflows
 
-Reusable GitHub Actions workflows for Open Terms Archive npm packages.
+Reusable GitHub Actions workflows for Open Terms Archive npm packages and Ansible collections.
 
 ## Available Workflows
 
@@ -34,13 +34,17 @@ Lints commit messages using commitlint.
 
 ### `release.yml`
 
-Performs the actual release: updates changelog, bumps version, creates tag, publishes to npm, creates GitHub release.
+Performs the actual release: updates changelog, bumps version, creates tag, publishes to npm or Ansible Galaxy, creates GitHub release.
 
 #### Inputs
 - `npm` — string, default `'publish'`
   - `'publish'` — update package.json + publish to npm
   - `'version'` — update package.json only (for private packages)
   - `'none'` — no package.json (GitHub release only)
+- `galaxy` — string, default `'none'`
+  - `'publish'` — update galaxy.yml + publish to Ansible Galaxy
+  - `'version'` — update galaxy.yml only (for collections not published on Ansible Galaxy)
+  - `'none'` — no galaxy.yml
 
 #### Required permissions
 When using `npm: publish`, the calling workflow must declare `id-token: write` for npm provenance.
@@ -51,6 +55,7 @@ When using `npm: publish`, the calling workflow must declare `id-token: write` f
 
 #### Secrets
 - `RELEASE_BOT_GITHUB_TOKEN`
+- `GALAXY_API_KEY` — required when using `galaxy: publish`
 
 ---
 
@@ -155,6 +160,19 @@ jobs:
     uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@main
     with:
       npm: none
+    secrets: inherit
+```
+
+### For Ansible collections
+
+```yaml
+  release:
+    needs: changelog
+    if: ${{ needs.changelog.outputs.release-type != 'no-release' }}
+    uses: OpenTermsArchive/shared-workflows/.github/workflows/release.yml@main
+    with:
+      npm: none
+      galaxy: publish
     secrets: inherit
 ```
 
